@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: abmsm-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: abmsm
+  template:
+    metadata:
+      labels:
+        app: abmsm
+    spec:
+      containers:
+        - name: api
+          image: abmsm-app:latest # change to your registry image
+          command: ["python", "api/app.py", "--port", "5000"]
+          ports:
+            - containerPort: 5000
+          env:
+            - name: MODEL_PATH
+              value: /app/models/trained
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+        - name: dashboard
+          image: abmsm-app:latest # change to your registry image
+          command: ["streamlit", "run", "web/dashboard.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
+          ports:
+            - containerPort: 8501
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: abmsm-api
+spec:
+  selector:
+    app: abmsm
+  ports:
+    - port: 5000
+      targetPort: 5000
+      name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: abmsm-dashboard
+spec:
+  type: LoadBalancer
+  selector:
+    app: abmsm
+  ports:
+    - port: 80
+      targetPort: 8501
+      name: http

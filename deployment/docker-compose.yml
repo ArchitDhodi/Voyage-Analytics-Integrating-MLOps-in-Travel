@@ -1,0 +1,45 @@
+version: "3.9"
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    command: bash -c "python api/app.py --port ${API_PORT:-5000}"
+    ports:
+      - "${API_PORT:-5000}:5000"
+    env_file:
+      - ../.env
+    volumes:
+      - ../models/trained:/app/models/trained
+      - ../data:/app/data
+      - ../api:/app/api
+
+  dashboard:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    command: bash -c "streamlit run web/dashboard.py --server.port ${STREAMLIT_PORT:-8501} --server.address 0.0.0.0"
+    ports:
+      - "${STREAMLIT_PORT:-8501}:8501"
+    env_file:
+      - ../.env
+    environment:
+      - API_URL=http://api:5000
+    depends_on:
+      - api
+    volumes:
+      - ../data:/app/data
+      - ../models/trained:/app/models/trained
+      - ../web:/app/web
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.16.0
+    command: mlflow server --host 0.0.0.0 --port ${MLFLOW_PORT:-5005} --backend-store-uri "file:///app/mlruns_local"
+    ports:
+      - "${MLFLOW_PORT:-5005}:5005"
+    volumes:
+      - ../mlruns_local:/app/mlruns_local
+      - mlflow-artifacts:/mlflow
+
+volumes:
+  mlflow-artifacts:
