@@ -1,236 +1,217 @@
-﻿# ABMSM Beginner Flight/MLOps Stack
+﻿![Voyage Analytics Banner](https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1600&auto=format&fit=crop)
 
-Beginner-friendly end-to-end MLOps project for travel analytics: flight price regression, gender classification, and hotel recommendations, served via a Flask API and Streamlit dashboard, tracked with MLflow, deployed with Docker/K8s, and orchestrated with Airflow.
+# Voyage Analytics - End-to-End MLOps Stack for Travel Intelligence
 
-## Prerequisites
-- Python 3.9+ (tested with 3.9)
-- Docker Desktop (for Docker/K8s/Airflow). Ensure it is running before `docker-compose` commands.
+**Production-Grade Machine Learning System for Flight Pricing, Gender Classification, and Hotel Recommendation**  
+Built with model training, MLflow tracking, API serving, Streamlit UI, Docker/Kubernetes deployment, and Airflow orchestration.
 
-## Quickstart (local)
-1) Create venv and install:
-```
-python -m venv .venv
-.\.venv\Scripts\activate
-pip install -r requirements.txt
-```
-2) Put real CSVs in `data/`:
+---
+
+## Project Overview
+
+This project implements a complete MLOps system for travel-domain analytics and prediction.
+It combines multiple ML tasks into one integrated platform:
+
+- **Flight Price Prediction** (regression)
+- **Gender Classification** (text classification)
+- **Hotel Recommendation** (content-based retrieval)
+
+Unlike notebook-only work, this project is structured as a deployable system with:
+
+- Model training workflows
+- Versioned artifacts
+- API inference endpoints
+- Interactive dashboard
+- MLflow experiment tracking
+- Containerized and orchestrated deployment options
+
+---
+
+## Problem Statement
+
+Travel platforms need fast, data-driven decisions across pricing, personalization, and user engagement.
+This project addresses that by building an integrated ML system that can:
+
+- Predict flight prices from trip and service features
+- Infer customer gender-related signals from profile text attributes
+- Recommend relevant hotels for users
+- Serve all predictions through scalable interfaces and deployment pipelines
+
+---
+
+## System Architecture
+
+Raw Data -> Cleaning & Wrangling -> Feature Engineering -> Model Training -> Artifact Registry -> API Layer -> Dashboard Layer -> MLOps Tracking & Deployment
+
+---
+
+## Data and Feature Pipeline
+
+### Data Sources
 - `data/flights.csv`
 - `data/users.csv`
 - `data/hotels.csv`
-3) Start dev stack:
-- Preferred (reads `.env`):
+
+### Processing Workflow
+- Data inspection and quality checks
+- Missing value and duplicate handling
+- Feature transformation and manipulation
+- Train/test splitting for model development
+
+### Feature Engineering Highlights
+- Mixed numerical and categorical features for flight pricing
+- TF-IDF based vectorization for text-driven tasks
+- Lightweight similarity pipeline for recommendations
+
+---
+
+## Model Layer
+
+### 1) Flight Price Prediction
+- Supervised regression workflow
+- Artifact: `models/trained/price_model.pkl`
+
+### 2) Gender Classification
+- TF-IDF + Logistic Regression pipeline
+- Artifact: `models/trained/gender_model.pkl`
+
+### 3) Hotel Recommendation
+- TF-IDF + cosine similarity (k-NN style retrieval)
+- Artifact: `models/trained/recommender.pkl`
+
+---
+
+## Serving and Deployment
+
+### API (Flask)
+Primary endpoints from `api/app.py`:
+- `/health`
+- `/predict` (flight price)
+- `/predict_batch`
+- `/gender`
+- `/recommend`
+
+### Dashboard (Streamlit)
+- File: `web/dashboard.py`
+- Interactive interface for prediction and recommendation flows
+
+### MLflow Tracking
+- Local run store: `mlruns_local/`
+- Tracks experiment runs, params, metrics, and artifacts
+
+### Container & Orchestration
+- Docker Compose: `deployment/docker-compose.yml`
+- Kubernetes manifests: `deployment/kubernetes/`
+- Airflow DAG: `pipelines/airflow/dags/flight_price_pipeline.py`
+
+---
+
+## Tech Stack
+
+- Python
+- pandas, NumPy, SciPy
+- scikit-learn
+- Flask
+- Streamlit
+- MLflow
+- Plotly
+- Docker
+- Kubernetes
+- Apache Airflow
+
+---
+
+## Project Structure
+
+```text
+ABSM Project 1/
+|-- api/
+|   `-- app.py
+|-- data/
+|   |-- flights.csv
+|   |-- users.csv
+|   `-- hotels.csv
+|-- deployment/
+|   |-- Dockerfile
+|   |-- docker-compose.yml
+|   `-- kubernetes/
+|-- mlruns_local/
+|-- models/
+|   `-- trained/
+|       |-- price_model.pkl
+|       |-- gender_model.pkl
+|       `-- recommender.pkl
+|-- notebooks/
+|   `-- abmsm_all_in_one.ipynb
+|-- pipelines/
+|   `-- airflow/
+|       |-- docker-compose.yml
+|       `-- dags/flight_price_pipeline.py
+|-- scripts/
+|-- web/
+|   `-- dashboard.py
+|-- requirements.txt
+|-- setup.py
+`-- github.readme
 ```
+
+---
+
+## Setup Instructions
+
+```bash
+# 1) Create environment
+python -m venv .venv
+.\.venv\Scripts\activate
+
+# 2) Install dependencies
+pip install -r requirements.txt
+
+# 3) Ensure datasets are present in data/
+#    flights.csv, users.csv, hotels.csv
+
+# 4) Run local stack
 python setup.py
 ```
-Choose option 1.
-- Or:
-```
-python scripts/run_dev.py
-```
-If using `scripts/run_dev.py`, set `MLFLOW_TRACKING_URI` in your shell to point at `mlruns_local`.
 
-Services:
-- API: http://localhost:5000
-- Dashboard: http://localhost:8501
-- MLflow: http://localhost:5005
+Choose:
+- `1` for local dev stack (API + Streamlit + MLflow)
+- `2` for full stack (Docker Compose + Airflow)
 
-## Objectives checklist
-- Regression model (flight price) in `notebooks/abmsm_all_in_one.ipynb`, artifact `models/trained/price_model.pkl`
-- REST API in `api/app.py`
-- Docker in `deployment/docker-compose.yml` and `deployment/Dockerfile`
-- Kubernetes manifests in `deployment/kubernetes/`
-- Airflow DAG in `pipelines/airflow/dags/flight_price_pipeline.py`
-- MLflow tracking in `mlruns_local/`
-- Gender classification in `notebooks/abmsm_all_in_one.ipynb`, artifact `models/trained/gender_model.pkl`
-- Hotel recommendation in `notebooks/abmsm_all_in_one.ipynb`, artifact `models/trained/recommender.pkl`, UI in `web/dashboard.py`
+---
 
-## Project structure
-- `api/`:
-  - `api/app.py` (Flask API: `/health`, `/predict`, `/predict_batch`, `/gender`, `/recommend`)
-- `data/`:
-  - `data/flights.csv`, `data/users.csv`, `data/hotels.csv`
-- `deployment/`:
-  - `deployment/Dockerfile`
-  - `deployment/docker-compose.yml`
-  - `deployment/kubernetes/` (K8s manifests)
-- `mlflow/`: reserved placeholder (can remain empty)
-- `mlruns_local/`: MLflow file store (runs, params, metrics, artifacts)
-- `models/`:
-  - `models/trained/price_model.pkl`
-  - `models/trained/gender_model.pkl`
-  - `models/trained/recommender.pkl`
-- `notebooks/`:
-  - `notebooks/abmsm_all_in_one.ipynb`
-- `pipelines/`:
-  - `pipelines/airflow/docker-compose.yml`
-  - `pipelines/airflow/dags/flight_price_pipeline.py`
-- `scripts/`:
-  - `scripts/run_dev.py`
-  - `scripts/train_price.py`
-  - `scripts/train_price_mlflow.py`
-  - `scripts/train_gender.py`
-  - `scripts/train_recommender.py`
-  - `scripts/train_all.py`
-- `web/`:
-  - `web/dashboard.py` (Streamlit UI)
-- `.env` (local settings)
-- `requirements.txt`
-- `setup.py`
+## Direct Run Commands
 
-## Environment variables (.env)
-```
-API_PORT=5000
-STREAMLIT_PORT=8501
-MLFLOW_PORT=5005
-API_URL=http://localhost:5000
-MODEL_PATH=models/trained
-MLFLOW_TRACKING_URI=file:///C:/Users/archi/New folder/abmsm_beginner/mlruns_local
-ENABLE_MLFLOW=true
-ENABLE_AIRFLOW=false
-ENABLE_K8S=false
-```
-Update `MLFLOW_TRACKING_URI` if your path differs.
+```bash
+# API
+python api/app.py
 
-## Training
-- Notebook: run `notebooks/abmsm_all_in_one.ipynb` top-to-bottom.
-- Scripts:
-```
+# Dashboard
+streamlit run web/dashboard.py
+
+# Train models (examples)
 python scripts/train_price.py
 python scripts/train_gender.py
 python scripts/train_recommender.py
 ```
-Artifacts are written to `models/trained/`.
 
-### API payloads
-- `/predict` expects `source,destination,flight_type,time,distance,agency,date`.
-- `/gender` accepts `name`, `company`, and `age` (preferred), or legacy `features` list.
-- `/recommend` expects query params `index` and `n`.
+---
 
-## Docker
-```
-cd deployment
-docker-compose up -d
-```
-Runs API, Streamlit, and MLflow. The compose file mounts local `data/`, `models/trained/`, `api/`, `web/`, and `mlruns_local/`.
-Stop services:
-```
-docker-compose down
-```
+## Business Value
 
-## Airflow
-```
-cd pipelines/airflow
-docker-compose up -d
-```
-Airflow UI: http://localhost:8081 (default `admin/admin`). DAG: `flight_price_pipeline`.
-Stop Airflow:
-```
-docker-compose down
-```
-If login is inconsistent, reset once:
-```
-docker-compose down -v
-docker-compose up -d
-```
+- Improves travel pricing intelligence
+- Enables faster personalization and recommendation
+- Demonstrates real-world ML system integration beyond model training
+- Showcases production-ready MLOps capabilities for portfolio and interviews
 
-## Kubernetes (optional)
-```
-kubectl apply -f deployment/kubernetes/
-kubectl port-forward svc/abmsm-api 5000:5000
-kubectl port-forward svc/abmsm-dashboard 8501:80
-```
-Update image name in the Deployment before applying.
+---
 
-## MLflow
-- File store: `mlruns_local/`
-- UI (local):
-```
-mlflow server --host 0.0.0.0 --port 5005 --backend-store-uri "file:///C:/Users/archi/New folder/abmsm_beginner/mlruns_local"
-```
-Open http://localhost:5005 and select the experiment to view runs.
+## Author
 
-## How to Use (end-to-end)
-### 1) Generate model artifacts (one-time or whenever you retrain)
-1) Open `notebooks/abmsm_all_in_one.ipynb`.
-2) Run the notebook top-to-bottom.
-3) This creates/overwrites:
-   - `models/trained/price_model.pkl`
-   - `models/trained/gender_model.pkl`
-   - `models/trained/recommender.pkl`
-4) MLflow runs are logged to `mlruns_local/` (make sure the path in `.env` is correct).
+**Archit Dhodi**
 
-### 2) Run the app with `setup.py`
-From the project root:
-```
-python setup.py
-```
-You will see:
-```
-1) Start (local) dev stack (API + Streamlit + MLflow)
-2) Start full stack (Docker Compose + Airflow)
-3) Exit
-```
+---
 
-#### Option 1: Local dev stack (API + Streamlit + MLflow)
-Steps:
-1) Ensure your virtualenv is active and `.env` exists.
-2) Run `python setup.py` and choose `1`.
-3) Services will start:
-   - API health: http://localhost:5000/health
-   - Dashboard: http://localhost:8501
-   - MLflow UI: http://localhost:5005
+## License
 
-Notes:
-- If you run `scripts/run_dev.py` instead, set `MLFLOW_TRACKING_URI` in the shell (or rely on `.env`).
-
-#### Option 2: Full stack (Docker Compose + Airflow)
-Before running:
-1) Start Docker Desktop (Linux containers).
-2) Ensure ports 5000, 8501, 5005, and 8081 are free.
-3) If a local MLflow server is already running on 5005, stop it first.
-
-Run:
-```
-python setup.py
-```
-Choose `2`. This will run:
-- `deployment/docker-compose.yml` (API, Streamlit, MLflow)
-- `pipelines/airflow/docker-compose.yml` (Airflow)
-
-Services:
-- API health: http://localhost:5000/health
-- Dashboard: http://localhost:8501
-- MLflow UI: http://localhost:5005
-- Airflow UI: http://localhost:8081 (default admin/admin)
-
-Stop services:
-```
-cd deployment
-docker-compose down
-cd ..\pipelines\airflow
-docker-compose down
-```
-
-Stop services (from anywhere, with full paths):
-```
-cd "C:\Users\archi\New folder\ABSM Project 1\deployment"
-docker-compose down
-cd "C:\Users\archi\New folder\ABSM Project 1\pipelines\airflow"
-docker-compose down
-```
-
-### 3) Kubernetes (optional)
-Before running:
-1) Enable Kubernetes in Docker Desktop.
-2) Install `kubectl` and verify: `kubectl get nodes`.
-3) Stop local Docker Compose stack to avoid port conflicts.
-
-Run:
-```
-kubectl apply -f deployment/kubernetes/
-kubectl port-forward svc/abmsm-api 5000:5000
-kubectl port-forward svc/abmsm-dashboard 8501:80
-```
-Then open:
-- API health: http://localhost:5000/health
-- Dashboard: http://localhost:8501
+Academic, learning, and portfolio demonstration use.
